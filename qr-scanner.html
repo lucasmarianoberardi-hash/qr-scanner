@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body {
+            background-color: #f29a5e;
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+        }
+        #qr-result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #096e13;
+        }
+        #info-text {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fc6128;
+        }
+        #reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info-text">Escanea el código QR del producto</div>
+    <div id="reader"></div>
+    <div id="qr-result"></div>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Code scanned = ${decodedText}`, decodedResult);
+            // Envía el resultado a la página principal
+            window.parent.postMessage({ type: 'qr-scan', data: decodedText }, '*');
+        }
+
+        function onScanFailure(error) {
+            console.warn(`Code scan error = ${error}`);
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    </script>
+</body>
+</html>
