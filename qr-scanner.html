@@ -1,57 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>QR Scanner</title>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner QR</title>
     <style>
         body {
-            background-color: #f29a5e;
             font-family: Arial, sans-serif;
-            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f29a5e;
+            height: 100vh;
             margin: 0;
-            padding: 0;
+            flex-direction: column;
+            color: #333;
         }
         #reader {
             width: 100%;
             max-width: 400px;
-            margin: auto;
         }
-        #qr-result {
+        .message {
             margin-top: 20px;
-            font-weight: bold;
-            color: #096e13;
-        }
-        #info-text {
+            font-size: 1.2em;
             text-align: center;
-            margin-bottom: 20px;
-            color: #fc6128;
-        }
-        #reader video {
-            width: 100% !important;
-            height: auto !important;
-            border-radius: 8px;
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <div id="info-text">Escanea el código QR del producto</div>
     <div id="reader"></div>
-    <div id="qr-result"></div>
+    <div class="message">Escaneando código...</div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <script>
+        // Esta función se ejecuta cuando el escáner detecta un código QR
         function onScanSuccess(decodedText, decodedResult) {
-            console.log(`Code scanned = ${decodedText}`, decodedResult);
-            // Envía el resultado a la página principal
-            window.parent.postMessage({ type: 'qr-scan', data: decodedText }, '*');
+            console.log(`Código escaneado: ${decodedText}`);
+
+            // Envía el texto decodificado a la página principal (index.html)
+            window.parent.postMessage({
+                type: 'qr-scan',
+                data: decodedText
+            }, '*'); // El '*' permite enviar a cualquier origen, ideal para desarrollo
+
+            // Detiene el escáner para evitar múltiples escaneos
+            html5QrcodeScanner.clear();
         }
 
+        // Esta función se ejecuta si el escaneo falla o hay un error
         function onScanFailure(error) {
-            console.warn(`Code scan error = ${error}`);
+            // Ignorar errores comunes para no sobrecargar la consola
         }
 
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
-
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", // ID del elemento donde se mostrará el escáner
+            { fps: 10, qrbox: { width: 250, height: 250 } }, // Configuración del escáner
+            false // No mostrar el "verbose" o logs detallados
+        );
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     </script>
 </body>
